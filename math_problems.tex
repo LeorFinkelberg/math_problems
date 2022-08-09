@@ -513,7 +513,55 @@ $$
 	\lim_{k \to \infty}\dfrac{u_{k+1}}{u_k} =\lim_{k \to \infty} \dfrac{k + 1}{k}\, \dfrac{a^{k+1}}{a^k} = \lim_{k \to \infty} \bigg( 1 + \dfrac{1}{k} \bigg) \, a = a < 1
 \end{align*}
 
-Ряд быстро сходится и уже при $ k=10 $ выходит на асимптоту $ \boxed{\mathbf{E}N = 1.905} $
+Ряд быстро сходится и уже при $ k=10 $ выходит на асимптоту $ \boxed{\mathbf{E}N = 1.905} $. Проверить полученное решение можно методом статистического моделирования 
+\begin{lstlisting}[
+style = ironpython,
+emph={simple_seq_gen},
+numbers = none
+]
+import numpy as np
+
+def simple_seq_gen(
+	prob_success: float,
+	prob_failure: float,
+	N: int
+) -> float:
+	"""
+	Генерирует заданное число серий ответов и
+	вычисляет среднее верных ответов
+	"""
+	answer_seqs = np.array([])
+
+	for _ in range(N):
+		answer_seq: np.array([int, int]) = np.random.choice(
+			[0, 1],
+			size=2,
+			p=[prob_failure, prob_success]
+		)
+
+		if answer_seq[-2] == answer_seq[-1]:
+			answer_seqs = np.concatenate([
+			answer_seqs,
+			np.array([answer_seq.sum()])
+		])
+		continue
+
+	while (answer_seq[-2] != answer_seq[-1]):
+		answer_seq = np.concatenate([
+			answer_seq,
+			np.array([np.random.choice([0, 1], p=[prob_failure, prob_success])]),
+		])
+
+	answer_seqs = np.concatenate([
+		answer_seqs,
+		np.array([answer_seq.sum()])
+	])
+
+	return answer_seqs.mean()
+\end{lstlisting}
+
+
+
 
 \listoffigures\addcontentsline{toc}{section}{Список иллюстраций}
 
